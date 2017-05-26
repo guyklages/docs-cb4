@@ -8,13 +8,13 @@
     <p>The SELECT statement takes a set of JSON documents from keyspaces as its input, manipulates
       it and returns a set of JSON documents in the result array. Since the schema for JSON
       documents is flexible, JSON documents in the result set have flexible schema as well.</p>
-    <p>A simple query in N1QL consists of three parts: <ul id="ul_inf_qjk_dx">
+    <p>A simple query in N1QL consists of three parts: <ol id="ol_c2w_gf3_11b">
         <li>SELECT: specifies the projection, which is the part of the document that is to be
           returned. </li>
         <li>FROM: specifies the keyspaces to work with. </li>
         <li>WHERE: specifies the query criteria (filters or predicates) that the results must
           satisfy.</li>
-      </ul></p>
+      </ol></p>
     <p>To query on a keyspace, you must either specify the document keys or use an index on the
       keyspace. </p>
     <p/>
@@ -26,29 +26,31 @@
     <p>For example, </p>
     <p>To execute the following statement, user does not need any special privileges.</p>
     <p>
-      <codeblock>SELECT 1</codeblock>
+      <codeblock outputclass="language-json">SELECT 1</codeblock>
     </p>
-    <p>To execute the following statement, user must have the  <i>Query Select</i> privilege on
-        <codeph>`travel-sample`</codeph>.</p>
+    <p>To execute the following statement, user must have the <i>Query Select</i> privilege
+        on<codeph> `travel-sample`</codeph>.</p>
     <p>
-      <codeblock>SELECT * FROM `travel-sample` </codeblock>
+      <codeblock outputclass="language-json">SELECT * FROM `travel-sample` </codeblock>
     </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
-        <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
+    <p>To execute the following statement, user must have the <i>Query Select</i> privilege
+        on<codeph> `travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
     <p>
-      <codeblock>SELECT * FROM `travel-sample` t  
-JOIN `beer-sample` b ON KEYS ["aldaris", "ale_asylum"]</codeblock>
-    </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
-        <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
-    <p>
-      <codeblock>SELECT * FROM `travel-sample` 
-WHERE city IN (SELECT raw city FROM `beer-sample`)</codeblock>
+      <codeblock outputclass="language-json">SELECT * FROM `travel-sample` t  
+JOIN `beer-sample` b 
+ON KEYS ["aldaris", "ale_asylum"]</codeblock>
     </p>
     <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
         <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
     <p>
-      <codeblock>SELECT * FROM `travel-sample` WHERE type = "hotel"
+      <codeblock outputclass="language-json">SELECT * FROM `travel-sample` 
+WHERE city 
+IN (SELECT raw city FROM `beer-sample`)</codeblock>
+    </p>
+    <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
+        <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
+    <p>
+      <codeblock outputclass="language-json">SELECT * FROM `travel-sample` WHERE type = "hotel"
 UNION 
 SELECT * FROM `beer-sample` WHERE type = "brewery"</codeblock>
     </p>
@@ -56,11 +58,12 @@ SELECT * FROM `beer-sample` WHERE type = "brewery"</codeblock>
     <p>The following example uses an index to query the keyspace for airports that are in the
       America/Anchorage timezone and at an altitude of 2100ft or higher, and returns an array with
       the airport name and city name for each airport that satisfies the
-      conditions.<codeblock spectitle="Query">SELECT t.airportname, t.city
+      conditions.<codeblock outputclass="language-json" spectitle="Query">SELECT t.airportname, t.city
 FROM   `travel-sample` t
 WHERE  type = "airport" 
        AND tz = "America/Anchorage" 
-       AND geo.alt >= 2100;</codeblock><codeblock spectitle="Results">[
+       AND geo.alt >= 2100;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
          "airportname": "Anaktuvuk Pass Airport",
          "city": "Anaktuvuk Pass",
@@ -68,7 +71,8 @@ WHERE  type = "airport"
 ]</codeblock></p>
     <p>The next example queries the keyspace using the document key
         "<userinput>airport_3469</userinput>".
-      <codeblock spectitle="Query">SELECT * FROM `travel-sample` USE KEYS "airport_3469";</codeblock><codeblock spectitle="Result">[
+      <codeblock outputclass="language-json" spectitle="Query">SELECT * FROM `travel-sample` USE KEYS "airport_3469";</codeblock><codeblock outputclass="language-json" spectitle="Result">Results:
+[
   {
     "travel-sample": {
       "airportname": "San Francisco Intl",
@@ -125,7 +129,7 @@ WHERE  type = "airport"
           <li>Grouping and aggregating the result objects. </li>
           <li>Ordering (sorting) items in the resultset in the order specified by the ORDER BY
             expression list. </li>
-          <li>Skipping the first <varname>n</varname> items in the result object as specified by the
+          <li>Skipping the first<varname> n </varname>items in the result object as specified by the
             OFFSET clause. </li>
           <li>Limiting the number of results returned using the LIMIT clause. </li>
    </ul></p>
@@ -140,11 +144,12 @@ WHERE  type = "airport"
             satisfied by the documents to be included in the resultset, and the resultset is
             returned as an array of airports that satisfy the condition. <note>The keys in the
               result object are ordered alphabetically at each
-            level.</note><codeblock spectitle="Query">SELECT * 
+            level.</note><codeblock outputclass="language-json" spectitle="Query">SELECT * 
 FROM   `travel-sample` 
 WHERE  type = "airport" 
        AND tz = "America/Anchorage" 
-       AND geo.alt >= 2000; </codeblock><codeblock spectitle="Result">[
+       AND geo.alt >= 2000; </codeblock><codeblock outputclass="language-json" spectitle="Result">Results:
+[
    {
       "travel-sample": {
          "airportname": "Anaktuvuk Pass Airport",
@@ -192,22 +197,24 @@ WHERE  type = "airport"
                 <title>Data model of travel-sample keyspace</title>
                 <image placement="break" href="../../travel-app/images/travel-app-data-model.png"
                   width="570" id="image_ggp_14k_dx"/>
-              </fig></p><p>The first example (<b>Example 1</b>) uses a JOIN clause to find the
-              distinct airline details which have routes that start from SFO. This example JOINS the
-              document of type "route" with documents of type "airline" using the KEY
-                "airlineid".<ul id="ul_frq_g4k_dx">
-                <li>Documents of type "route" are on the left side of JOIN, and documents of type
-                  "airline" are on the right side of JOIN. </li>
-                <li>The documents of type "route" (on the left) contain the foreign key "airlineid"
-                  of documents of type "airline" (on the right). </li>
-              </ul><codeblock spectitle="Example 1: Query">SELECT DISTINCT airline.name, airline.callsign, route.destinationairport, route.stops, route.airline
+              </fig></p><p><b>Example 1</b>:  Use a JOIN clause to find the distinct airline details
+              which have routes that start from SFO. This example JOINS the document of type<codeph>
+                route </codeph>with documents of type<codeph> airline </codeph>using the KEY<codeph>
+                airlineid</codeph>.<ul id="ul_frq_g4k_dx">
+                <li>Documents of type<codeph> route </codeph>are on the left side of JOIN, and
+                  documents of type<codeph> airline </codeph>are on the right side of JOIN. </li>
+                <li>The documents of type<codeph> route </codeph>(on the left) contain the foreign
+                    key<codeph> airlineid </codeph>of documents of type<codeph> airline </codeph>(on
+                  the right). </li>
+              </ul><codeblock outputclass="language-json" spectitle="Example 1: Query">SELECT DISTINCT airline.name, airline.callsign, route.destinationairport, route.stops, route.airline
 FROM `travel-sample` route 
   JOIN `travel-sample` airline 
   ON KEYS route.airlineid 
 WHERE route.type = "route" 
   AND airline.type = "airline" 
   AND route.sourceairport = "SFO" 
-LIMIT 2;</codeblock><codeblock spectitle="Example 1: Results">[
+LIMIT 2;</codeblock><codeblock outputclass="language-json" spectitle="Example 1: Results">Results:
+[
    {
       "airline": "SY",
       "callsign": "SUN COUNTRY",
@@ -223,29 +230,30 @@ LIMIT 2;</codeblock><codeblock spectitle="Example 1: Results">[
 
       "stops": 0
    }
-]</codeblock></p><p>Let's
-              consider another example (<b>Example 2)</b> which finds the number of distinct
-              airports where AA has routes. In this example: <ul id="ul_gy2_npk_dx">
-                <li>Documents of type "airline" are on the left side of JOIN, and documents of type
-                  "route" are on the right side.</li>
-                <li>The WHERE clause predicate airline.iata = "AA" is on the right side keyspace
-                  "airlines".</li>
+]</codeblock></p><p><b>Example
+                2</b>:  Find the number of distinct airports where<codeph> AA </codeph>has routes.
+              In this example: <ul id="ul_gy2_npk_dx">
+                <li>Documents of type<codeph> airline </codeph>are on the left side of JOIN, and
+                  documents of type<codeph> route </codeph>are on the right side.</li>
+                <li>The WHERE clause predicate<codeph> airline.iata = "AA" </codeph>is on the right
+                  side keyspace<codeph> airlines</codeph>.</li>
               </ul></p><p>This example illustrates a special kind of JOIN where the documents on the
               right side of JOIN contain the foreign key reference to the documents on the left
               side. Such JOINs are referred to as index JOIN. See <xref
                 href="from.dita#concept_rnt_zfk_np/join-clause"/> for more details.</p><p>Index JOIN
-              requires a special inverse index <parmname>route_airlineid</parmname> on the JOIN key
-              ‘route.airlineid’. Create this index using the following command:
-              <codeblock>CREATE INDEX route_airlineid ON `travel-sample`(airlineid) 
+              requires a special inverse index<codeph> route_airlineid </codeph>on the JOIN
+                key<codeph> route.airlineid</codeph>. Create this index using the following command:
+              <codeblock outputclass="language-json">CREATE INDEX route_airlineid ON `travel-sample`(airlineid) 
 WHERE type = "route";</codeblock></p><p>Now
               we can execute the following query.
-              <codeblock spectitle="Example 2: Query">SELECT Count(DISTINCT route.sourceairport) AS distinctairports1 
+              <codeblock outputclass="language-json" spectitle="Example 2: Query">SELECT Count(DISTINCT route.sourceairport) AS distinctairports1 
 FROM `travel-sample` airline 
   JOIN `travel-sample` route 
   ON KEY route.airlineid FOR airline 
 WHERE  route.type = "route" 
   AND    airline.type = "airline" 
-  AND    airline.iata = "AA";</codeblock><codeblock spectitle="Example 2: Results">[
+  AND    airline.iata = "AA";</codeblock><codeblock outputclass="language-json" spectitle="Example 2: Results">Results:
+[
    {
       "distinctairports1": 429
    }
@@ -255,13 +263,14 @@ WHERE  route.type = "route"
               expression such as projections, FROM clauses, and WHERE clauses. </p><p>A subquery is executed once for every input document to the outer statement and it returns an
               array every time it is evaluated. See <xref href="subqueries.dita#topic_9"/> for more
               details.
-              <codeblock spectitle="Query">SELECT * 
+              <codeblock outputclass="language-json" spectitle="Query">SELECT * 
 FROM   (SELECT t.airportname 
         FROM   (SELECT * 
                 FROM   `travel-sample` t 
                 WHERE  type = "airport" 
                        AND country = "United States" 
-                LIMIT  1) AS s1) AS s2;</codeblock><codeblock spectitle="Results">[
+                LIMIT  1) AS s1) AS s2;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "s2": {
          "airportname": "Barter Island Lrrs"
@@ -273,34 +282,39 @@ FROM   (SELECT t.airportname
           <dt>Deep Traversal for Nested Documents</dt>
           <dd>When querying a bucket with nested documents, SELECT provides an easy way to traverse
             deep nested documents using the dot notation and NEST and UNNEST clauses. <p>The
-              following query looks for the schedule, and accesses the flight id for
-              destinationaiport=ALG. Since a given flight has multiple schedules, attribute
-              "schedule" is an array containing all schedules for the specified flight. You can
-              access the individual array elements using the array indexes. For brevity, we’re
-              limiting the number of results in the query to 1.
-              <codeblock spectitle="Query">SELECT t.schedule[0].flight AS flightid 
+              following query looks for the schedule, and accesses the flight id for<codeph>
+                destinationaiport=ALG</codeph>. Since a given flight has multiple schedules,
+                attribute<codeph> schedule </codeph>is an array containing all schedules for the
+              specified flight. You can access the individual array elements using the array
+              indexes. For brevity, we’re limiting the number of query results to 1.
+              <codeblock outputclass="language-json" spectitle="Query">SELECT t.schedule[0].flight AS flightid 
 FROM `travel-sample` t 
 WHERE type="route" 
   AND destinationairport="ALG" 
-LIMIT 1;</codeblock><codeblock spectitle="Results">[
+LIMIT 1;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "flightid": "AH631"
 
    }
 ]</codeblock></p></dd>
-          <dd><b>NEST and UNNEST</b><p>Note that, an array is created with the matching nested documents. In this example: <ul>
-                <li>The ‘airline’ field in the result is an array of the `travel-sample` documents
-                  that are matched with the key route.airlineid.</li>
-                <li>Hence, the projection is accessed as airline[0] to pick the first element of the
-                  array.</li>
-              </ul><codeblock spectitle="Query">SELECT DISTINCT route.sourceairport, 
+          <dd><b>NEST and UNNEST</b><p>When using NEST, an array is created with the matching nested
+              documents. </p><p><b>Example 3</b>:  Use the NEST clause to list all AA airline
+              routes.  In this example: <ul id="ul_iph_w33_11b">
+                <li>The<codeph> airline </codeph>field in the result is an array of the<codeph>
+                    `travel-sample` </codeph>documents that are matched with the key<codeph>
+                    route.airlineid</codeph>.</li>
+                <li>Hence, the projection is accessed as<codeph> airline[0] </codeph>to pick the
+                  first element of the array.</li>
+              </ul><codeblock outputclass="language-json" spectitle="Query">SELECT DISTINCT route.sourceairport, 
                 route.airlineid, 
                 airline[0].callsign 
 FROM `travel-sample` route NEST `travel-sample` airline 
   ON KEYS route.airlineid 
 WHERE route.type = "route" 
   AND route.airline = "AA" 
-LIMIT 4;</codeblock><codeblock spectitle="Results">[
+LIMIT 4;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "airlineid": "airline_24",
       "callsign": "AMERICAN",
@@ -321,13 +335,14 @@ LIMIT 4;</codeblock><codeblock spectitle="Results">[
       "callsign": "AMERICAN",
       "sourceairport": "GGT"
    }
-]</codeblock></p>
-          <p>The following example uses the UNNEST clause to retrieve the author names from the
-              reviews
-              object.<codeblock spectitle="Query">SELECT r.author 
+]</codeblock></p><p><b>Example
+                4</b>:  Use the UNNEST clause to retrieve the<codeph> author </codeph>names from
+                the<codeph> reviews
+              </codeph>object.<codeblock outputclass="language-json" spectitle="Query">SELECT r.author 
 FROM `travel-sample` t UNNEST t.reviews r 
 WHERE t.type = "hotel" 
-LIMIT 4;</codeblock><codeblock spectitle="Results">[
+LIMIT 4;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "author": "Ozella Sipes"
    },
@@ -345,12 +360,13 @@ LIMIT 4;</codeblock><codeblock spectitle="Results">[
         <dlentry id="aggregation">
           <dt>Aggregation</dt>
           <dd>As part of a single SELECT statement, you can also perform aggregation using the SUM,
-            COUNT, AVG, MIN, MAX, or ARRAY AVG functions. <p>The following example counts the total
-              number of flights to SFO:
-              <codeblock spectitle="Query">SELECT count(schedule[*]) AS totalflights 
+            COUNT, AVG, MIN, MAX, or ARRAY AVG functions. <p><b>Example 5</b>:  Use the COUNT
+              function to count the total number of flights to SFO:
+              <codeblock outputclass="language-json" spectitle="Query">SELECT count(schedule[*]) AS totalflights 
 FROM `travel-sample` t 
 WHERE type="route" 
-  AND destinationairport="SFO";</codeblock><codeblock spectitle="Results">[
+  AND destinationairport="SFO";</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "totalFlights": 250
    }
@@ -358,9 +374,10 @@ WHERE type="route"
         </dlentry>
         <dlentry id="combine-resultsets">
           <dt>Combining Resultsets Using Operators</dt>
-          <dd>You can combine the result sets using the UNION or INTERSECT operators. <p>Consider the following
-              example which looks for the first schedule for flights to "SFO" and
-              "BOS":<codeblock spectitle="Query">(SELECT t.schedule[0] 
+          <dd>You can combine the result sets using the UNION or INTERSECT operators. <p><b>Example
+                6</b>:  Use the UNION clause to look for the first schedule for flights to<codeph>
+                SFO </codeph>and<codeph>
+              BOS</codeph>:<codeblock outputclass="language-json" spectitle="Query">(SELECT t.schedule[0] 
  FROM `travel-sample` t 
  WHERE type = "route" 
    AND destinationairport = "SFO" 
@@ -370,7 +387,8 @@ UNION ALL
  FROM `travel-sample` t 
  WHERE type = "route" 
    AND destinationairport = "BOS" 
- LIMIT  1);</codeblock><codeblock spectitle="Results">[
+ LIMIT  1);</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "$1": {
          "day": 0,
@@ -393,17 +411,19 @@ UNION ALL
           <dd>You can perform further processing on the data in your result set before the final
             projection is generated. You can group data using the GROUP BY clause, sort data using
             the ORDER BY clause, and you can limit the number of results included in the result set
-            using the LIMIT clause. <p>The following example looks for the number of airports at an
-              altitude of 5000 ft or higher and groups the results by country and timezone. It then
-              sorts the results by country names and timezones (ascending order by default).
-              <codeblock spectitle="Query">SELECT COUNT(*)  AS count, 
+            using the LIMIT clause. <p>Example 7:  Use the GROUP BY and ORDER BY clauses on the
+              resulting list for the number of airports at an altitude of 5000 ft or higher, grouped
+              by country and timezone, and then sorted by country names and timezones (ascending
+              order by default).
+              <codeblock outputclass="language-json" spectitle="Query">SELECT COUNT(*)  AS count, 
        t.country AS country, 
        t.tz AS timezone 
 FROM `travel-sample` t 
 WHERE type = "airport" 
   AND geo.alt >= 5000 
 GROUP BY t.country, t.tz 
-ORDER BY t.country, t.tz; </codeblock><codeblock spectitle="Results">[
+ORDER BY t.country, t.tz; </codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+[
    {
       "count": 2,
       "country": "France",
