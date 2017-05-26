@@ -411,10 +411,10 @@ UNION ALL
           <dd>You can perform further processing on the data in your result set before the final
             projection is generated. You can group data using the GROUP BY clause, sort data using
             the ORDER BY clause, and you can limit the number of results included in the result set
-            using the LIMIT clause. <p>Example 7:  Use the GROUP BY and ORDER BY clauses on the
-              resulting list for the number of airports at an altitude of 5000 ft or higher, grouped
-              by country and timezone, and then sorted by country names and timezones (ascending
-              order by default).
+            using the LIMIT clause. <p><b>Example 7</b>:  Use the GROUP BY and ORDER BY clauses on
+              the resulting list for the number of airports at an altitude of 5000 ft or higher,
+              grouped by country and timezone, and then sorted by country names and timezones
+              (ascending order by default).
               <codeblock outputclass="language-json" spectitle="Query">SELECT COUNT(*)  AS count, 
        t.country AS country, 
        t.tz AS timezone 
