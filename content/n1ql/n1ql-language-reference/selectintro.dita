@@ -2,8 +2,8 @@
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="topic_xwp_r3k_dx">
   <title>Overview</title>
-  <shortdesc>With the SELECT statement, you can query and manipulate JSON data. You can select, join, project, nest, unnest, group, and sort in a single SELECT statement.
-  </shortdesc>
+  <shortdesc>With the SELECT statement, you can query and manipulate JSON data. You can select,
+    join, project, nest, unnest, group, and sort in a single SELECT statement. </shortdesc>
   <body>
     <p>The SELECT statement takes a set of JSON documents from keyspaces as its input, manipulates
       it and returns a set of JSON documents in the result array. Since the schema for JSON
@@ -19,59 +19,65 @@
       keyspace. </p>
     <p/>
     <p><b>RBAC Privileges</b></p>
-    <p>User executing the SELCET statement must have the <i>Query Select</i> privileges granted on
-      all keyspaces referred in the query. Note that, the SELECT query may not refer to any keyspace
-      or with JOIN queries or subqueries, it may refer to multiple keyspaces. For more details about
-      user roles, see <xref href="../../security/security-authorization.dita#authorization"/>.</p>
-    <p>For example, </p>
-    <p>To execute the following statement, user does not need any special privileges.</p>
+    <p>Users executing the SELECT statement must have the <i>Query Select</i> privileges granted on
+      all keyspaces referred in the query. Note that, the SELECT query may refer to multiple
+      keyspaces with JOIN queries or subqueries. For more details about user roles, see <xref
+        href="../../security/security-authorization.dita#authorization"/>.</p>
+    <p><b>Example 1</b>:  To execute the following statement, users do not need any special
+      privileges.</p>
     <p>
       <codeblock outputclass="language-json">SELECT 1</codeblock>
     </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege
-        on<codeph> `travel-sample`</codeph>.</p>
+    <p><b>Example 2</b>:  To execute the following statement, users must have the <i>Query
+        Select</i> privilege on<codeph> `travel-sample`</codeph>.</p>
     <p>
       <codeblock outputclass="language-json">SELECT * FROM `travel-sample` </codeblock>
     </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege
-        on<codeph> `travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
+    <p><b>Example 3</b>:  To execute the following statement, users must have the <i>Query
+        Select</i> privilege on<codeph> `travel-sample` </codeph>and<codeph>
+      `beer-sample`</codeph>.</p>
     <p>
       <codeblock outputclass="language-json">SELECT * FROM `travel-sample` t  
 JOIN `beer-sample` b 
 ON KEYS ["aldaris", "ale_asylum"]</codeblock>
     </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
-        <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
+    <p><b>Example 4</b>:  To execute the following statement, users must have the <i>Query
+        Select</i> privilege on<codeph> `travel-sample` </codeph>and<codeph>
+      `beer-sample`</codeph>.</p>
     <p>
       <codeblock outputclass="language-json">SELECT * FROM `travel-sample` 
 WHERE city 
-IN (SELECT raw city FROM `beer-sample`)</codeblock>
+IN (SELECT RAW city FROM `beer-sample`)</codeblock>
     </p>
-    <p>To execute the following statement, user must have the <i>Query Select</i> privilege on
-        <codeph>`travel-sample`</codeph> and <codeph>`beer-sample`</codeph>.</p>
+    <p><b>Example 5</b>:  To execute the following statement, users must have the <i>Query
+        Select</i> privilege on<codeph> `travel-sample` </codeph>and<codeph>
+      `beer-sample`</codeph>.</p>
     <p>
       <codeblock outputclass="language-json">SELECT * FROM `travel-sample` WHERE type = "hotel"
 UNION 
 SELECT * FROM `beer-sample` WHERE type = "brewery"</codeblock>
     </p>
-    <p/>
-    <p>The following example uses an index to query the keyspace for airports that are in the
-      America/Anchorage timezone and at an altitude of 2100ft or higher, and returns an array with
-      the airport name and city name for each airport that satisfies the
-      conditions.<codeblock outputclass="language-json" spectitle="Query">SELECT t.airportname, t.city
+    <p><b>Example 6</b>:  Use an index to query the keyspace for airports that are in the
+      America/Anchorage timezone and at an altitude of 2100 feet or
+      higher.<codeblock outputclass="language-json" spectitle="Query">SELECT t.airportname, t.city
 FROM   `travel-sample` t
 WHERE  type = "airport" 
        AND tz = "America/Anchorage" 
-       AND geo.alt >= 2100;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
+       AND geo.alt >= 2100;</codeblock>This
+      returns an array with the airport name and city name for each airport that satisfies these two
+      conditions.<codeblock outputclass="language-json" spectitle="Results">Results:
 [
    {
          "airportname": "Anaktuvuk Pass Airport",
          "city": "Anaktuvuk Pass",
    }
 ]</codeblock></p>
-    <p>The next example queries the keyspace using the document key
-        "<userinput>airport_3469</userinput>".
-      <codeblock outputclass="language-json" spectitle="Query">SELECT * FROM `travel-sample` USE KEYS "airport_3469";</codeblock><codeblock outputclass="language-json" spectitle="Result">Results:
+    <p><b>Example 7</b>: Query the keyspace using the document key<userinput>
+        airport_3469</userinput>.
+      <codeblock outputclass="language-json" spectitle="Query">SELECT meta().id AS doc_key, * 
+FROM `travel-sample` USE KEYS "airport_3469";</codeblock>This
+      returns an array of all fields with that document
+        key.<codeblock outputclass="language-json" spectitle="Result">Results:
 [
   {
     "travel-sample": {
@@ -90,38 +96,65 @@ WHERE  type = "airport"
       "tz": "America/Los_Angeles"
     }
   }
+]</codeblock><b>Example
+        7a</b>: Query the keyspace using two
+      keys.<codeblock outputclass="language-json">SELECT airportname
+FROM `travel-sample
+USE KEYS ["airport_3469", "airport_3470"];</codeblock></p>
+    <p>This results in listing the two corresponding airport
+      names.<codeblock outputclass="language-json">[
+  {
+    "airportname": "San Francisco Intl"
+  },
+  {
+    "airportname": "Cut Bank Muni"
+  }
 ]</codeblock></p>
-    <p>With projections, you retrieve just the fields that you need and not the entire document.
-      This is especially useful when querying for a large dataset as it results in shorter
-      processing times and better performance.</p>
-    <p>The SELECT statement provides a variety of data processing capabilities such as <xref
-        href="#topic_xwp_r3k_dx/filtering" format="dita">filtering</xref>, <xref
-        href="#topic_xwp_r3k_dx/query-across-relationships" format="dita">querying across
-        relationships</xref> using JOINs or subqueries, <xref
-        href="#topic_xwp_r3k_dx/deep-traversal-nested-docs" format="dita">deep traversal of nested
-        documents</xref>, <xref href="#topic_xwp_r3k_dx/aggregation" format="dita"
-        >aggregation</xref>, <xref href="#topic_xwp_r3k_dx/combine-resultsets" format="dita"
-        >combining result sets</xref> using operators, <xref
-        href="#topic_xwp_r3k_dx/group-sort-limit" format="dita">grouping</xref>, <xref
-        href="#topic_xwp_r3k_dx/group-sort-limit" format="dita">sorting</xref>, and more. Follow the
-      links for examples that demonstrate each capability.</p>
- <section><title>SELECT Statement Processing</title>
-   <p>The SELECT statement queries a keyspace and returns a JSON array that contains zero or more objects.</p>
-   <p>The following diagram shows the query execution workflow at a high level and illustrates the
-        interaction with the query, index, and data services. <fig id="fig_knp_lkk_dx">
+    <p><b>Projections</b></p>
+    <p>With projections, you retrieve just the fields that you need instead of the entire document.
+      This is especially useful when querying a large dataset since it results in shorter processing
+      times and better performance. For details, see <xref
+        href="selectclause.dita#concept_qqp_xfk_np"/>.</p>
+    <p><b>Capabilities</b></p>
+    <p>The SELECT statement provides a variety of data processing capabilities.  For examples that
+      demonstrate each capability, see the following links:<ul id="ul_stz_25s_b1b">
+        <li><xref href="#topic_xwp_r3k_dx/filtering" format="dita">filtering</xref></li>
+        <li><xref href="#topic_xwp_r3k_dx/query-across-relationships" format="dita">querying across
+            relationships</xref> using JOINs or subqueries</li>
+        <li><xref href="#topic_xwp_r3k_dx/deep-traversal-nested-docs" format="dita">deep traversal
+            of nested documents</xref></li>
+        <li><xref href="#topic_xwp_r3k_dx/aggregation" format="dita">aggregation</xref></li>
+        <li><xref href="#topic_xwp_r3k_dx/combine-resultsets" format="dita">combining result
+            sets</xref> using operators</li>
+        <li><xref href="#topic_xwp_r3k_dx/group-sort-limit" format="dita">grouping</xref></li>
+        <li><xref href="#topic_xwp_r3k_dx/group-sort-limit" format="dita">sorting</xref></li>
+      </ul></p>
+    <section>
+      <title>SELECT Statement Processing</title>
+      <p>The SELECT statement queries a keyspace and returns a JSON array that contains zero or more
+        objects.</p>
+      <p>The following diagram shows the query execution workflow at a high level and illustrates
+        the interaction with the query, index, and data services. <fig id="fig_knp_lkk_dx">
           <title>Query Execution Workflow</title>
           <image placement="break" href="images/query_execution.png" width="570"
             id="image_lnp_lkk_dx"/>
         </fig></p>
-   <p>The SELECT statement is executed as a sequence of steps. Each step in the process produces result objects that are then used as inputs in the next step until all steps in the process are complete. While the workflow diagram shows all the possible phases a query goes through before returning a result, the clauses and predicates in a query decide the phases and the number of times that the query goes through. For example, sort phase can be skipped when there is no ORDER BY clause in the query; scan-fetch-join phase will execute multiple times for correlated subqueries.</p>
-   <p>The following diagram shows the possible elements and operations during query execution.
-        <fig id="fig_t4d_c35_gx">
+      <p>The SELECT statement is executed as a sequence of steps. Each step in the process produces
+        result objects that are then used as inputs in the next step until all steps in the process
+        are complete. While the workflow diagram shows all the possible phases a query goes through
+        before returning a result, the clauses and predicates in a query decide the phases and the
+        number of times that the query goes through. </p>
+      <p>For example, the "sort" phase can be skipped when there is no ORDER BY clause in the query;
+        and conversely, the "scan-fetch-join" phase will execute multiple times for correlated
+        subqueries.</p>
+      <p>The following diagram shows the possible elements and operations during query execution.
+          <fig id="fig_t4d_c35_gx">
           <title>Query Execution Phases</title>
           <image placement="break" href="images/query_service.svg" width="670" height="300"
             id="image_u4d_c35_gx"/>
         </fig></p>
-   <p>The possible elements and operations in a query include: <ul>
-     <li>Specifying the keyspace that is queried.</li>
+      <p>The possible elements and operations in a query include: <ul>
+          <li>Specifying the keyspace that is queried.</li>
           <li>Specifying the document keys or using indexes to access the documents. </li>
           <li>Fetching the data from the data service. </li>
           <li>Filtering the result objects by specifying conditions in the WHERE clause. </li>
@@ -132,9 +165,10 @@ WHERE  type = "airport"
           <li>Skipping the first<varname> n </varname>items in the result object as specified by the
             OFFSET clause. </li>
           <li>Limiting the number of results returned using the LIMIT clause. </li>
-   </ul></p>
- </section>
-    <section><title>Data Processing Capabilities</title>
+        </ul></p>
+    </section>
+    <section>
+      <title>Data Processing Capabilities</title>
       <dl>
         <dlentry id="filtering">
           <dt>Filtering</dt>
@@ -190,14 +224,14 @@ WHERE  type = "airport"
           <dt>Querying Across Relationships</dt>
           <dd><p>You can use the SELECT statement to query across relationships using the JOIN
               clause or subqueries.</p><b>JOIN Clause</b><p>Before we delve into examples, let's
-              take a look at the data model of the travel-sample keyspace, which is used in the
-              following examples. For more details about the data model, see <xref
+              take a look at the data model of the<codeph> travel-sample </codeph>keyspace, which is
+              used in the following examples. For more details about the data model, see <xref
                 href="../../travel-app/travel-app-data-model.dita#concept_hyy_k1z_pr"/>.<fig
                 id="fig_fgp_14k_dx">
                 <title>Data model of travel-sample keyspace</title>
                 <image placement="break" href="../../travel-app/images/travel-app-data-model.png"
                   width="570" id="image_ggp_14k_dx"/>
-              </fig></p><p><b>Example 1</b>:  Use a JOIN clause to find the distinct airline details
+              </fig></p><p><b>Example 8</b>: Use a JOIN clause to find the distinct airline details
               which have routes that start from SFO. This example JOINS the document of type<codeph>
                 route </codeph>with documents of type<codeph> airline </codeph>using the KEY<codeph>
                 airlineid</codeph>.<ul id="ul_frq_g4k_dx">
@@ -231,8 +265,8 @@ LIMIT 2;</codeblock><codeblock outputclass="language-json" spectitle="Example 1:
       "stops": 0
    }
 ]</codeblock></p><p><b>Example
-                2</b>:  Find the number of distinct airports where<codeph> AA </codeph>has routes.
-              In this example: <ul id="ul_gy2_npk_dx">
+                9</b>: Find the number of distinct airports where<codeph> AA </codeph>has routes. In
+              this example: <ul id="ul_gy2_npk_dx">
                 <li>Documents of type<codeph> airline </codeph>are on the left side of JOIN, and
                   documents of type<codeph> route </codeph>are on the right side.</li>
                 <li>The WHERE clause predicate<codeph> airline.iata = "AA" </codeph>is on the right
@@ -260,10 +294,12 @@ WHERE  route.type = "route"
 ]</codeblock></p></dd>
           <dd><b>Subqueries</b><p>A subquery is an expression that is evaluated by executing an
               inner SELECT query. Subqueries can be used in most places where you can use an
-              expression such as projections, FROM clauses, and WHERE clauses. </p><p>A subquery is executed once for every input document to the outer statement and it returns an
-              array every time it is evaluated. See <xref href="subqueries.dita#topic_9"/> for more
-              details.
-              <codeblock outputclass="language-json" spectitle="Query">SELECT * 
+              expression such as projections, FROM clauses, and WHERE clauses. </p><p>A subquery is
+              executed once for every input document to the outer statement and it returns an array
+              every time it is evaluated. See <xref href="subqueries.dita#topic_9"/> for more
+              details. </p><p><b>Example 10</b>:  Select 1 of the names of the airports in the
+              United
+              States.<codeblock outputclass="language-json" spectitle="Query">SELECT * 
 FROM   (SELECT t.airportname 
         FROM   (SELECT * 
                 FROM   `travel-sample` t 
@@ -281,12 +317,13 @@ FROM   (SELECT t.airportname
         <dlentry id="deep-traversal-nested-docs">
           <dt>Deep Traversal for Nested Documents</dt>
           <dd>When querying a bucket with nested documents, SELECT provides an easy way to traverse
-            deep nested documents using the dot notation and NEST and UNNEST clauses. <p>The
-              following query looks for the schedule, and accesses the flight id for<codeph>
-                destinationaiport=ALG</codeph>. Since a given flight has multiple schedules,
-                attribute<codeph> schedule </codeph>is an array containing all schedules for the
-              specified flight. You can access the individual array elements using the array
-              indexes. For brevity, we’re limiting the number of query results to 1.
+            deep nested documents using the dot notation with NEST and UNNEST clauses. <p><b>Example
+                11</b>: Select 1 of the many flights from the flight schedule array that has a
+              Destination Airport of ALG.</p><p>This query looks for the schedule, and accesses the
+              flight id for<codeph> destinationaiport=ALG</codeph>. Since a given flight has
+              multiple schedules, attribute<codeph> schedule </codeph>is an array containing all
+              schedules for the specified flight. You can access the individual array elements using
+              the array indexes. For brevity, we’re limiting the number of query results to 1.
               <codeblock outputclass="language-json" spectitle="Query">SELECT t.schedule[0].flight AS flightid 
 FROM `travel-sample` t 
 WHERE type="route" 
@@ -298,9 +335,9 @@ LIMIT 1;</codeblock><codeblock outputclass="language-json" spectitle="Results">R
 
    }
 ]</codeblock></p></dd>
-          <dd><b>NEST and UNNEST</b><p>When using NEST, an array is created with the matching nested
-              documents. </p><p><b>Example 3</b>:  Use the NEST clause to list all AA airline
-              routes.  In this example: <ul id="ul_iph_w33_11b">
+          <dd><b>NEST</b><p>When using NEST, an array is created with the matching nested documents.
+                </p><p><b>Example 12</b>: Use the NEST clause to list all<codeph> AA
+              </codeph>airline routes. In this example: <ul id="ul_iph_w33_11b">
                 <li>The<codeph> airline </codeph>field in the result is an array of the<codeph>
                     `travel-sample` </codeph>documents that are matched with the key<codeph>
                     route.airlineid</codeph>.</li>
@@ -335,35 +372,90 @@ LIMIT 4;</codeblock><codeblock outputclass="language-json" spectitle="Results">R
       "callsign": "AMERICAN",
       "sourceairport": "GGT"
    }
-]</codeblock></p><p><b>Example
-                4</b>:  Use the UNNEST clause to retrieve the<codeph> author </codeph>names from
-                the<codeph> reviews
-              </codeph>object.<codeblock outputclass="language-json" spectitle="Query">SELECT r.author 
+]</codeblock></p><p><b>UNNEST</b></p><p>UNNEST
+              is the opposite of NEST; it takes an array of nested documents and creates a flattened
+              list of matching fields.</p><p><b>Example 13</b>: Use the UNNEST clause to make a list
+              of authors who wrote a review and the hotel name they reviewed, sorted alphabetically
+              by hotel name.  list the<codeph> author </codeph>names from the<codeph> reviews
+              </codeph>object in the<codeph> hotel
+              </codeph>bucket.<codeblock outputclass="language-json">SELECT r.author, t.name AS Hotel  
 FROM `travel-sample` t UNNEST t.reviews r 
 WHERE t.type = "hotel" 
-LIMIT 4;</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
-[
-   {
-      "author": "Ozella Sipes"
-   },
-   {
-      "author": "Barton Marks"
-   },
-   {
-      "author": "Blaise O'Connell IV"
-   },
-   {
-      "author": "Nedra Cronin"
-   }
-]</codeblock></p></dd>
+ORDER BY Hotel
+LIMIT 4;</codeblock>This
+              results in two entries for the<codeph> 'La Mirande Hotel </codeph>and two entries for
+                the<codeph> 500 West
+              Hotel</codeph>:<codeblock outputclass="language-json">[
+  {
+    "Hotel": "'La Mirande Hotel",
+    "author": "Marianne Wintheiser"
+  },
+  {
+    "Hotel": "'La Mirande Hotel",
+    "author": "Deondre Predovic III"
+  },
+  {
+    "Hotel": "500 West Hotel",
+    "author": "Iliana Pacocha"
+  },
+  {
+    "Hotel": "500 West Hotel",
+    "author": "Isabel Denesik"
+  }
+]</codeblock></p>Without
+            using UNNEST, the above list of authors would remain in an array of authors which could
+            be listed only by a particular row within that array or kept together within their own
+            array, as seen below.</dd>
+          <dd><b>Example 13a</b>:  List all authors who reviewed the first 4 hotels
+            alphabetically.<codeblock outputclass="language-json">SELECT reviews[*].author, name AS Hotel 
+FROM `travel-sample`
+WHERE type = "hotel" 
+  AND reviews[*].author is not null
+ORDER BY Hotel
+LIMIT 4;</codeblock></dd>
+          <dd>This results in arrays of authors for each
+            hotel:<codeblock outputclass="language-json">[
+  {
+    "Hotel": "'La Mirande Hotel",
+    "author": [
+      "Marianne Wintheiser",
+      "Deondre Predovic III"
+    ]
+  },
+  {
+    "Hotel": "500 West Hotel",
+    "author": [
+      "Isabel Denesik",
+      "Iliana Pacocha",
+      "Delbert Borer",
+      "Jakob Runte"
+    ]
+  },
+  {
+    "Hotel": "54 Boutique Hotel",
+    "author": [
+      "Allie Weber III",
+      "Nikko Kovacek",
+      "Linda McKenzie",
+      "Eliseo Walsh",
+      "Miss Zoey Eichmann"
+    ]
+  },
+  {
+    "Hotel": "8 Clarendon Crescent",
+    "author": [
+      "Timmothy Bechtelar"
+    ]
+  }
+]</codeblock></dd>
         </dlentry>
         <dlentry id="aggregation">
           <dt>Aggregation</dt>
           <dd>As part of a single SELECT statement, you can also perform aggregation using the SUM,
-            COUNT, AVG, MIN, MAX, or ARRAY AVG functions. <p><b>Example 5</b>:  Use the COUNT
+            COUNT, AVG, MIN, MAX, or ARRAY AVG functions. <p><b>Example 14</b>:  Use the COUNT
               function to count the total number of flights to SFO:
-              <codeblock outputclass="language-json" spectitle="Query">SELECT count(schedule[*]) AS totalflights 
-FROM `travel-sample` t 
+              <codeblock outputclass="language-json" spectitle="Query">SELECT COUNT(schedule[*]) AS totalflights 
+FROM `travel-sample` 
 WHERE type="route" 
   AND destinationairport="SFO";</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
 [
@@ -375,29 +467,29 @@ WHERE type="route"
         <dlentry id="combine-resultsets">
           <dt>Combining Resultsets Using Operators</dt>
           <dd>You can combine the result sets using the UNION or INTERSECT operators. <p><b>Example
-                6</b>:  Use the UNION clause to look for the first schedule for flights to<codeph>
-                SFO </codeph>and<codeph>
-              BOS</codeph>:<codeblock outputclass="language-json" spectitle="Query">(SELECT t.schedule[0] 
+                15</b>: Use the UNION clause to look for the first schedule for flights to<codeph>
+                SFO </codeph>and to<codeph>
+              BOS</codeph>:<codeblock outputclass="language-json" spectitle="Query">(SELECT t.schedule[0] to_SFO
  FROM `travel-sample` t 
  WHERE type = "route" 
    AND destinationairport = "SFO" 
  LIMIT  1) 
 UNION ALL 
-(SELECT t.schedule[0] 
+(SELECT t.schedule[0] to_BOS
  FROM `travel-sample` t 
  WHERE type = "route" 
    AND destinationairport = "BOS" 
  LIMIT  1);</codeblock><codeblock outputclass="language-json" spectitle="Results">Results:
 [
    {
-      "$1": {
+      "to_SFO": {
          "day": 0,
          "flight": "AM982",
          "utc": "09:11:00"
       }
    },
    {
-      "$1": {
+      "to_BOS": {
          "day": 0,
          "flight": "AI339",
          "utc": "23:05:00"
@@ -411,10 +503,10 @@ UNION ALL
           <dd>You can perform further processing on the data in your result set before the final
             projection is generated. You can group data using the GROUP BY clause, sort data using
             the ORDER BY clause, and you can limit the number of results included in the result set
-            using the LIMIT clause. <p><b>Example 7</b>:  Use the GROUP BY and ORDER BY clauses on
-              the resulting list for the number of airports at an altitude of 5000 ft or higher,
-              grouped by country and timezone, and then sorted by country names and timezones
-              (ascending order by default).
+            using the LIMIT clause. <p><b>Example 16</b>: Use the GROUP BY and ORDER BY clauses on
+              the resulting list for the number of airports at an altitude of 5000 feet or higher,
+              grouped by country and timezone, and then sorted by country and timezone (ascending
+              order by default).
               <codeblock outputclass="language-json" spectitle="Query">SELECT COUNT(*)  AS count, 
        t.country AS country, 
        t.tz AS timezone 

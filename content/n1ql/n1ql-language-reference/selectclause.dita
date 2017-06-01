@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
 <concept id="concept_qqp_xfk_np">
-  <title>SELECT clause</title>
+  <title>Query Projection</title>
+  <shortdesc> The SELECT clause specifies a list of properties (columns) by name or by the wildcard
+    character (*) to mean every property.   </shortdesc>
   <conbody>
-    <p><i>select-clause:</i></p>
-    <codeblock>SELECT ( [ALL | DISTINCT]  ( result-expression [, result-expression]*) | 
-    (RAW | ELEMENT) expression) </codeblock>
-    <p><i>result-expression:</i></p>
-    <codeblock>[(path .)] * | expression [ ([AS] alias) ]</codeblock>
-    <p><i>path:</i></p>
-    <codeblock>identifier [ <b>[</b> expression <b>]</b> ] [. path]</codeblock>
-    <p><i>alias:</i></p>
-    <codeblock>identifier</codeblock>
+    <p>The SELECT clause contains the following elements and syntax:</p>
+    <codeblock>SELECT ( [ALL | DISTINCT]  ( <varname>result-expr</varname> [, <varname>result-expr</varname>]*) | 
+    (RAW | ELEMENT) <varname>expr</varname>) </codeblock>
     <p><b>ALL</b></p>
-    <p>SELECT ALL retrieves all of the data specified. ALL will display "all" of the specified
-      columns including all of the duplicates. The ALL keyword is the default if nothing is
-      specified.</p>
+    <p>SELECT ALL retrieves all of the data specified. ALL will display every record of the
+      specified columns including all of the duplicates. The ALL keyword is the default if nothing
+      is specified.</p>
     <p><b>DISTINCT</b></p>
     <p>The DISTINCT clause removes duplicate result objects from the query's result set. If the
       DISTINCT clause is not used, the query returns all objects that meet the query conditions in a
       result set, which might include duplicates.</p>
-    <p>Example</p>
+    <p><b>result-expr</b></p>
+    <p>This is any expression that lists the fields to be included in the SELECT clause.  These
+      fields can be inside a nested array, which is specified by including the <i>path</i> to those
+      fields.  Furthermore, these fields (or nested fields) can be assigned a shortened <i>alias</i>
+      to refer to them more easily.  The syntax of the<varname> result-expr </varname>is as
+      follows:</p>
+    <codeblock>[(<varname>path</varname> .)] * | <varname>expr</varname> [ ([AS] <varname>alias</varname>) ]</codeblock>
+    <p><b>Example 1</b>:  Use SELECT to return the latitude and name of the northernmost hotel.</p>
+    <codeblock outputclass="language-json">SELECT geo.lat AS Latitude, name 
+FROM `travel-sample`
+WHERE type="hotel"
+ORDER BY geo.lat DESC
+LIMIT 1;</codeblock>
+    <p>Which results in:</p>
+    <codeblock outputclass="language-jason">[
+  {
+    "Latitude": 60.15356,
+    "name": "Lerwick Youth Hostel"
+  }
+]</codeblock>
+    <p><b>Example 1a</b>: Use SELECT DISTINCT to return all unique<codeph> airline </codeph>values
+      in the<codeph> `travel-sample`
+      </codeph>bucket.<codeblock>SELECT airline FROM `travel-sample`
+LIMIT 10;</codeblock></p>
+    <p><b>Example 2</b>:  Use SELECT DISTINCT to return only unique<codeph> airline </codeph>values
+      of Example 1.</p>
     <codeblock>SELECT DISTINCT orderlines[0].productId FROM orders    </codeblock>
     <p>Results</p>
     <codeblock>{
@@ -54,9 +75,10 @@
     }
   ]
 }</codeblock>
-    <note>Starting version 4.5.1, the DISTINCT clause is no longer blocking in nature. It streams the input and produces the output in-parallel, all while consuming less memory.</note>
+    <note>Starting in Couchbase Server version 4.5.1, the DISTINCT clause is no longer blocking in
+      nature. It streams the input and produces the output in-parallel, all while consuming less
+      memory.</note>
     <p><b>RAW/ELEMENT</b></p>
     <p> Specifies a raw expression. </p>
-
   </conbody>
 </concept>

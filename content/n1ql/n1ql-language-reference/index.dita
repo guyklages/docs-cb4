@@ -2,8 +2,16 @@
 <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
 <concept id="n1ql-lang-ref">
  <title>N1QL Language Reference</title>
- <shortdesc>The N1QL reference guide describes the N1QL language structure, syntax, and shows how to run N1QL queries from a command line. It also provides reference information about the basic elements in N1QL which can be combined to build N1QL statements. </shortdesc>
+ <shortdesc>The N1QL reference guide describes the N1QL language structure, syntax, and  how to run
+    N1QL queries from a command line. It also provides reference information about the basic
+    elements in N1QL which can be combined to build N1QL statements. </shortdesc>
  <conbody>
+    <p>N1QL queries can be issued from:<ul id="ul_dlw_g4s_b1b">
+        <li>The Query Editor</li>
+        <li>The CBQ Shell</li>
+        <li>SDKs</li>
+        <li>CURL</li>
+      </ul></p>
      <!-- <p>This guide consists of the following topics: <ul id="ul_mm2_2ps_nt">
           <li>
             <xref href="../n1ql-intro/langstruct.dita#topic_3"/></li>
@@ -56,7 +64,7 @@
          <dlentry>
            <dt>Comments</dt>
            <dd>N1QL supports block comments. Here is the syntax:
-             <codeblock>/* [[text] | [newline]]+ */</codeblock></dd>
+             <codeblock outputclass="language-json">/* [[text] | [newline]]+ */</codeblock></dd>
          </dlentry>
 
        </dl>
@@ -64,14 +72,15 @@
      <title>Nested Path Expressions</title>
      <p>In N1QL, nested paths indicate an expression to access nested sub-documents within a
        JSON document or expression. </p>
-     <p>For example, the latitude of a location in the<codeph> type="airport" </codeph> documents in
-          the<codeph> `travel-sample` </codeph>are in the <codeph>geo</codeph> sub-document and can
+     <p>For example, the latitude of a location in the<codeph> type="airport" </codeph>documents in
+          the<codeph> `travel-sample` </codeph>are in the<codeph> geo </codeph>sub-document and can
         be addressed as the nested path<codeph> `travel-sample`.geo.lat</codeph>:</p>
      <p>
-       <codeblock>SELECT airportname, city, geo, round(geo.lat) as latitude
+       <codeblock outputclass="language-json">SELECT airportname, city, geo, ROUND(geo.lat) AS latitude
 FROM `travel-sample` t1
 WHERE t1.type = "airport" LIMIT 1;
 
+Results:
 [
   {
     "airportname": "Calais Dunkerque",
