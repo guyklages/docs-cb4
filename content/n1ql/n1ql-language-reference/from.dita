@@ -73,7 +73,7 @@ from-term::= keyspace-ref [ [ AS ] alias ] [ use-keys-clause ]
      <p><varname>rhs-expression</varname>: keyspace or expression corresponding to the right hand side of JOIN.</p>
      <p><varname>lhs-expression</varname>: keyspace or expression corresponding to the left hand side of JOIN.</p>
      <p><varname>lhs-expression-key</varname>: attribute in <varname>rhs-expression</varname>
-            referrencing primary key for <varname>lhs-expression</varname>.</p>
+            referencing primary key for <varname>lhs-expression</varname>.</p>
      
      <p><i>nest-clause:</i></p>
      <codeblock>[ <varname>join-type</varname> ] NEST <varname>from-path</varname> [ ( [ AS ] alias ) ] <varname>on-keys-clause</varname> </codeblock>
@@ -84,7 +84,8 @@ from-term::= keyspace-ref [ [ AS ] alias ] [ use-keys-clause ]
 <p><b>Omitted FROM clause</b></p>
   <p>If the FROM clause is omitted, the data source is equivalent to an array containing a single 
    empty object. This allows you to evaluate expressions that do not depend on stored data.</p>
-  <p>Evaluating an expression<codeph> SELECT 10 + 20 </codeph>produces the following result:</p>
+  <p><b>Example 1</b>:  Evaluating an expression<codeph> SELECT 10 + 20 </codeph>produces the
+            following result:</p>
 <codeblock>[ { "$1" : 30 } ] </codeblock>
   <p>Counting the number of inputs<codeph> SELECT COUNT(*) AS input_count </codeph>produces the
             following result:</p>
@@ -104,45 +105,108 @@ from-term::= keyspace-ref [ [ AS ] alias ] [ use-keys-clause ]
         <section id="section_ekc_ftt_nz"><title>Keyspace Identifier</title><p>This is the name or
                 identifier of an independent keyspace that can serve as a data source or bucket of
                 one or more documents. Such keyspace is not dependent on any of the <xref
-                    href="subqueries.dita#topic_9/section_onz_3tj_mz"/>.</p>The following example Q1
-            uses the keyspace<codeph> `travel-sample`</codeph>.<p>
-                <codeblock>Example Q1:
-
-SELECT t1.city
+                    href="subqueries.dita#topic_9/section_onz_3tj_mz"/>.</p><b>Example 2</b>:  List
+            4 cities that have a landmark.<p>
+                <codeblock>SELECT DISTINCT t1.city
 FROM `travel-sample` t1
-WHERE t1.type = "landmark" LIMIT 4;</codeblock>
-            </p><p dir="ltr">The following non-correlated subquery example Q2 uses the
-                    keyspace<codeph> `travel-sample` </codeph>independent of the same keyspace used
-                in the outer query: </p><p>
-                <codeblock>Example Q2: Find cities that have landmarks and airports.
-
-SELECT t1.city
+WHERE t1.type = "landmark" 
+ORDER BY city
+LIMIT 4;</codeblock>
+            </p>This gives the
+                results:<codeblock>[
+  {
+    "city": null
+  },
+  {
+    "city": "Abbeville"
+  },
+  {
+    "city": "Abbots Langley"
+  },
+  {
+    "city": "Aberdeenshire"
+  }
+]</codeblock><p
+                dir="ltr"><b>Example 2b</b>:  List 4 cities that have a landmark and an airport by
+                using a non-correlated subquery of the keyspace<codeph> `travel-sample`
+                </codeph>independent of the same keyspace used in the outer query.</p><p>
+                <codeblock>SELECT DISTINCT t1.city
 FROM `travel-sample` t1
-WHERE t1.type = "landmark" AND 
-      t1.city IN (SELECT RAW city
+WHERE t1.type = "landmark" 
+  AND t1.city IN (SELECT RAW city
                   FROM `travel-sample` 
-                  WHERE type = "airport");</codeblock>
-            </p><p dir="ltr">The following correlated subquery Q2A uses keyspace alias from outer
-                query.</p><p>
-                <codeblock>Example Q2A: Find cities that have museum landmarks.
-
-SELECT t1.city, t1.name
+                  WHERE type = "airport")
+ORDER BY city
+LIMIT 4;</codeblock>
+            </p><p>This gives the
+                results:<codeblock>[
+  {
+    "city": "Abbeville"
+  },
+  {
+    "city": "Avignon"
+  },
+  {
+    "city": "Bangor"
+  },
+  {
+    "city": "Beaune"
+  }
+]</codeblock></p><p
+                dir="ltr"><b>Example 2c</b>:  List 4 cities alphabetically that have museum
+                landmarks by using a keyspace alias from the outer query.</p><p>
+                <codeblock>SELECT DISTINCT t1.city, t1.name
 FROM `travel-sample` t1
-WHERE t1.type = "landmark" AND 
-      (SELECT raw t2
+WHERE t1.type = "landmark"
+  AND (SELECT raw t2
        FROM split(t1.name) t2 
-       WHERE t2 = "museum")[0] is not null;</codeblock>
-            </p><p dir="ltr">The following subquery example Q2B uses different keyspaces in
-                outer/inner queries.</p><p>
-                <codeblock>Example Q2B: Find cities that have landmarks and breweries.
-
-SELECT t1.city
+       WHERE t2 = "museum")[0] is not null
+ORDER BY city
+LIMIT 4;</codeblock>
+            </p><p>This gives the
+                results:<codeblock>[
+  {
+    "city": "Isle of Anglesey",
+    "name": "Swtan heritage museum"
+  },
+  {
+    "city": "L'Isle-sur-la-Sorgue",
+    "name": "Campredon museum"
+  },
+  {
+    "city": "Londonderry",
+    "name": "Railway museum"
+  },
+  {
+    "city": "Washington",
+    "name": "Washington 'F' Pit mining museum"
+  }
+]</codeblock></p><p
+                dir="ltr"><b>Example 2d</b>:  List 4 cities alphabetically that have landmarks and
+                breweries by using different keyspaces in outer/inner queries. </p><p>
+                <codeblock>SELECT DISTINCT t1.city
 FROM `travel-sample` t1
-WHERE t1.type = "landmark" AND 
-      t1.city IN (SELECT RAW b1.city
+WHERE t1.type = "landmark"
+  AND t1.city IN (SELECT RAW b1.city
                   FROM `beer-sample` b1
-                  WHERE b1.type = "brewery");</codeblock>
-            </p></section>
+                  WHERE b1.type = "brewery")
+ORDER BY city
+LIMIT 4;</codeblock>
+            </p><p>This gives the
+                results:<codeblock>[
+  {
+    "city": "Bangor"
+  },
+  {
+    "city": "Bedford"
+  },
+  {
+    "city": "Berkeley"
+  },
+  {
+    "city": "Bristol"
+  }
+]</codeblock></p></section>
         <section id="section_fkc_ftt_nz">
             <title>N1QL Expression</title>
             <p>Couchbase Server version 4.6.2 adds support for generic <xref
@@ -188,14 +252,14 @@ SELECT * FROM CURL(...) as ks2;</codeblock>
                             <dlentry>
                                 <dt><b>Subquery and Subquery Expressions</b></dt>
                                 <dd/>
-                                <dd>A subquery itself can appear as <codeph>from-term</codeph>
-                                    expression. In this case, the subquery results are fed as data
-                                    source to the outer query. Further, subqueries can occur as a
-                                    subquery, or as constituent part of a bigger N1QL expression.<p
-                                        dir="ltr">For example, the following example Q3 shows a
-                                        simple case of using subquery in FROM clause, though N1QL is
-                                        powerful enough to express it without a subquery (as shown
-                                        in example Q3A):</p><p>
+                                <dd>A subquery itself can appear as<codeph> from-term
+                                    </codeph>expression. In this case, the subquery results are fed
+                                    as data source to the outer query. Further, subqueries can occur
+                                    as a subquery, or as constituent part of a bigger N1QL
+                                        expression.<p dir="ltr">For example, the following example
+                                        Q3 shows a simple case of using subquery in FROM clause,
+                                        though N1QL is powerful enough to express it without a
+                                        subquery (as shown in example Q3A):</p><p>
                                         <codeblock>Example Q3: Find highest altitude airports/cities in each country
  
 SELECT t1.country, t1.max_country_alt, 

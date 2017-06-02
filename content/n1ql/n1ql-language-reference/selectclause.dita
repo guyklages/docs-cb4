@@ -13,7 +13,7 @@
       specified columns including all of the duplicates. The ALL keyword is the default if nothing
       is specified.</p>
     <p><b>DISTINCT</b></p>
-    <p>The DISTINCT clause removes duplicate result objects from the query's result set. If the
+    <p>The DISTINCT clause removes duplicate result objects from the query's resultset. If the
       DISTINCT clause is not used, the query returns all objects that meet the query conditions in a
       result set, which might include duplicates.</p>
     <p><b>result-expr</b></p>
