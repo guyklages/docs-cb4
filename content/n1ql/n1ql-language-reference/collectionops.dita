@@ -5,97 +5,107 @@
 	<title>Collection Operators</title>
 	<conbody xtrc="/w:document/w:body[1]/w:p[628]">
 		<p>Collection operators enable you to evaluate expressions over collections or objects. The
-			operators include ANY, EVERY, ARRAY, FIRST, EXISTS, IN and WITHIN.</p>
+			operators include <codeph>ANY</codeph>, <codeph>EVERY</codeph>, <codeph>ARRAY</codeph>,
+				<codeph>FIRST</codeph>, <codeph>EXISTS</codeph>, <codeph>IN</codeph> and
+				<codeph>WITHIN</codeph>.</p>
 
 		<codeblock>exists-expression | in-expression | within-expression | ANY | EVERY | ARRAY | FIRST</codeblock>
 
-		<section id="collection-op-any">
-			<title>ANY</title>
-			<codeblock> ANY variable ( IN  | WITHIN ) expression 
-     [  ,  variable ( IN | WITHIN ) expression  ]* 
-     SATISFIES condition  END </codeblock>
-
-			<p>ANY is a range predicate that tests a Boolean condition over the elements
-				or attributes of a collection, object, or objects. It uses the IN and WITHIN operators
-				to range through the collection.</p>
-			<p>If at least one item in the array satisfies the ANY expression, then it returns TRUE. Otherwise, it returns FALSE.</p>
-			<p>The following query retrieves all contacts who have one or more children over the age of 14. In this example, the query returns one item for 'dave' because one of his children is 17.</p>
-			<codeblock spectitle="Query:">SELECT name
-  FROM contacts
-  WHERE ANY child IN children
-  SATISFIES child.age > 14 END    </codeblock>
-			<codeblock spectitle="Result:">"results": [ { "name": "dave" }, .... ]</codeblock>
-
-			<p>Sometimes the conditions you want to filter need to be applied to the arrays nested
-				inside the document. The SATISFIES keyword is used to specify the filter condition. The
-				expression after the ANY clause allows us to assign an identifier to an element in the
-				array that we are searching through. </p>
-			<codeblock spectitle="Query:"> SELECT fname, children
-    FROM tutorial 
-        WHERE ANY child IN tutorial.children SATISFIES child.age > 10  END</codeblock>
-			<codeblock spectitle="Result:">{"results":[
+		<section id="collection-op-any"
+					><title>ANY</title><codeblock> ANY <varname>variable1</varname> ( IN | WITHIN ) <varname>expression1</varname> 
+ [ , <varname>variable2</varname> ( IN | WITHIN ) <varname>expression2</varname>  ] * 
+ SATISFIES <varname>condition1</varname> END </codeblock><p><codeph>ANY
+				</codeph>is a range predicate that tests a Boolean condition over the elements or
+				attributes of a collection, object, or objects. </p><p><codeph>IN
+					</codeph>and<codeph> WITHIN </codeph>operators range through the
+					collection.<codeph> IN </codeph>includes only the current level of the
+				collection; whereas,<codeph> WITHIN </codeph>includes all sub-levels, child, and
+				descendants of the collection.</p><p><codeph>SATISFIES </codeph>is used to specify
+				the filter condition. The expression after the ANY clause allows us to assign an
+				identifier to an element in the array that we are searching through. </p><p>If at
+				least one item in the array satisfies the<codeph> ANY </codeph>expression, then it
+					returns<codeph> true</codeph>. Otherwise, it returns<codeph>
+					false</codeph>.</p><p><b>Example 1</b>: Retrieve all contacts who have one or
+				more children over the age of
+			14.</p><codeblock spectitle="Query:">   SELECT name
+     FROM contacts
+WHERE ANY child
+       IN children
+SATISFIES child.age > 14 END    </codeblock>This
+			query returns one item, because one of his children is
+					17.<codeblock spectitle="Result:">"results": [ { "name": "dave" }, .... ]</codeblock><p><b>Example
+					2</b>: Retrieve all contacts who have one or more children over the age of 10
+				and are in arrays nested inside the document.
+			</p><codeblock spectitle="Query:">   SELECT fname, children
+     FROM tutorial 
+WHERE ANY child
+       IN tutorial.children
+SATISFIES child.age > 10  END</codeblock>This
+			query returns three
+				items.<codeblock spectitle="Result:">{"results":[
   {"children":[{"age":17,"fname":"Aiden","gender":"m"},{"age":2,"fname":"Bill","gender":"f"}],"fname":"Dave"},
   {"children":[{"age":17,"fname":"Xena","gender":"f"},{"age":2,"fname":"Yuri","gender":"m"}],"fname":"Earl"},
   {"children":[{"age":17,"fname":"Abama","gender":"m"},{"age":21,"fname":"Bebama","gender":"m"}],"fname":"Ian"}
-]}</codeblock>
-			<note>The SOME and ANY operators perform the same function and can be used interchangeably. </note>
-		</section>
+]}</codeblock><note>The
+				SOME and ANY operators perform the same function and can be used interchangeably.
+			</note></section>
 
-		<section id="collection-op-every">
-			<title>EVERY</title>
-			<codeblock>EVERY variable ( IN  | WITHIN ) expression 
-   [  ,  variable ( IN | WITHIN ) expression  ]* 
-   SATISFIES condition  END   </codeblock>
-			<p>EVERY is a range predicate that tests a Boolean condition over the elements
-				or attributes of a collection, object, or objects. It uses the IN and WITHIN operators
-				to range through the collection.</p>
-			<p>If every array element satisfies the EVERY expression, it returns TRUE. Otherwise, it returns FALSE. If the array is empty, it returns TRUE. </p>
-			<p>The EVERY operator returns TRUE if all items meet the condition.</p>
-			<p> For example, the following query is almost
-				identical to the preceding one except EVERY is used instead of ANY. This query scans
-				all contacts and returns the name of any contact that has children over the age of
-				10. The result tells us that out of all of the contacts only 'ian' has children who
-				are all over the age 10. </p>
-			<codeblock spectitle="Query:"> SELECT name
-    FROM contacts
-    WHERE EVERY child IN children
-    SATISFIES child.age > 10 END</codeblock>
-			<codeblock spectitle="Result:">  { "name": "ian" }</codeblock>
-			<p>Sometimes the conditions you want to filter need to be applied to the arrays nested
-				inside the document. The SATISFIES keyword is used to specify the filter condition. The
-				expression after the EVERY clause allows us to assign a name to an element in the array
-				that we are searching through. </p>
-			<codeblock spectitle="Query:"> SELECT fname, children
-    FROM tutorial 
-        WHERE EVERY child 
-        IN tutorial.children 
-        SATISFIES child.age > 10  END    </codeblock>
-			<codeblock spectitle="Result:">{"results":[
-   {"children":[{"age":17,"fname":"Aiden","gender":"m"},{"age":2,"fname":"Bill","gender":"f"}],"fname":"Dave"},
-   {"children":[{"age":17,"fname":"Xena","gender":"f"},{"age":2,"fname":"Yuri","gender":"m"}],"fname":"Earl"},
-   {"children":[{"age":17,"fname":"Abama","gender":"m"},{"age":21,"fname":"Bebama","gender":"m"}],"fname":"Ian"}]}</codeblock>
-		</section>
+		<section id="collection-op-every"
+					><title>EVERY</title><codeblock>EVERY <varname>variable</varname> ( IN | WITHIN ) <varname>expression</varname> 
+   [  ,  <varname>variable</varname> ( IN | WITHIN ) <varname>expression</varname> ] * 
+   SATISFIES <varname>condition</varname>  END   </codeblock><p><codeph>EVERY
+				</codeph>is a range predicate that tests a Boolean condition over the elements or
+				attributes of a collection, object, or objects. </p><p><codeph>IN
+					</codeph>and<codeph> WITHIN </codeph>operators range through the
+					collection.<codeph> IN </codeph>includes only the current level of the
+				collection; whereas,<codeph> WITHIN </codeph>includes all sub-levels, child, and
+				descendants of the collection.</p><p><codeph>SATISFIES </codeph>is used to specify
+				the filter condition. The expression after the ANY clause allows us to assign an
+				identifier to an element in the array that we are searching through. </p><p>If every
+				array element satisfies the<codeph> EVERY </codeph><varname>expression</varname>, it
+					returns<codeph> true</codeph>. Otherwise, it returns<codeph> false</codeph>.
+				</p><p>If the array is empty, it returns<codeph> true</codeph>. </p><p>The EVERY
+				operator returns<codeph> true </codeph>if all items meet the
+					<varname>condition</varname>.</p><p><b>Example 1b</b>: Same as Example 1,
+					except<codeph> EVERY </codeph>is used instead of <codeph>ANY</codeph>. This
+				query scans all contacts and returns the name of  contacts who children are all over
+				the age of 10.
+			</p><codeblock spectitle="Query:">     SELECT name
+       FROM contacts
+WHERE EVERY child
+         IN children
+  SATISFIES child.age > 10 END</codeblock>The
+			result tells us that out of all of the contacts, only "ian" has children who are all
+			over the age 10.
+					<codeblock spectitle="Result:">  { "name": "ian" }</codeblock><p><b>Example
+					2b</b>: Same as Example 2, except EVERY is used instead of ANY. Retrieve all
+				contacts who have children all over the age of 10 and are in arrays nested inside
+				the document.
+			</p><codeblock spectitle="Query:">     SELECT fname, children
+       FROM tutorial 
+WHERE EVERY child 
+         IN tutorial.children 
+  SATISFIES child.age > 10  END    </codeblock>This
+			query returns only one
+			item.<codeblock spectitle="Result:">{"results":[
+   {"children":[{"age":17,"fname":"Abama","gender":"m"},{"age":21,"fname":"Bebama","gender":"m"}],"fname":"Ian"}]}</codeblock></section>
 
 		<section id="collection-op-array">
 			<title>ARRAY</title>
-			<p>
-				<i>array-expression:</i>
-			</p>
-			<codeblock>ARRAY expression FOR variable ( IN |  WITHIN ) expression
-   [ ,  variable ( IN | WITHIN ) expression ]* [ ( WHEN  condition) ] END</codeblock>
-			<p> The ARRAY operator lets you map and filter the elements or attributes of a collection,
-				object, or objects. It evaluates to an array of the operand expression, that satisfies
-				the WHEN clause, if provided. </p>
+			<codeblock>ARRAY <varname>expressionA</varname> FOR <varname>variable1</varname> ( IN | WITHIN ) <varname>expression1</varname>
+                   [ ,  <varname>variable2</varname> ( IN | WITHIN ) <varname>expression2</varname> ] * 
+                   [ ( WHEN  <varname>condition1</varname>) ] END</codeblock>
+			<p>The ARRAY operator lets you map and filter the elements or attributes of a collection, object,
+				or objects. </p>
+			<p>It evaluates to an array of the operand expression, that satisfies the WHEN clause,
+				if provided. </p>
 		</section>
 
 		<section>
 			<title>FIRST</title>
-			<p>
-				<i>first-expression:</i>
-			</p>
-			<codeblock>FIRST expression FOR variable ( IN |  WITHIN ) 
-  expression [ ,  variable ( IN | WITHIN ) expression]* 
-  [ ( WHEN  condition) ] END</codeblock>
+			<codeblock>FIRST <varname>expressionA</varname> FOR <varname>variable1</varname> ( IN | WITHIN ) <varname>expression1</varname>
+                    [ , <varname>variable2</varname> ( IN | WITHIN ) <varname>expression2</varname> ] * 
+                    [ ( WHEN  <varname>condition1</varname>) ] END</codeblock>
 
 			<p>The FIRST operator enables you to map and filter the elements or attributes of a collection, object, or objects. It evaluates to a single element based on the operand expression that satisfies the WHEN clause, if provided.</p>
 
